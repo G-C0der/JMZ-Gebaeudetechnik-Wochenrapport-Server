@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import {sequelize} from './';
+import {workdayFieldLengths} from "../constants";
 
 class Workday extends Model {
   public id!: number;
@@ -36,19 +37,19 @@ Workday.init({
     allowNull: false
   },
   from: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING(workdayFieldLengths.from.max)
   },
   to: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING(workdayFieldLengths.to.max)
   },
   from2: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING(workdayFieldLengths.from2.max)
   },
   to2: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING(workdayFieldLengths.to2.max)
   },
   project: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(workdayFieldLengths.project.max),
     allowNull: false
   },
   code: {
