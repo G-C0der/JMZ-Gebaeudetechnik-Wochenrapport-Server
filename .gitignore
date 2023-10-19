@@ -1,0 +1,9 @@
+# JetBrains
+.idea
+
+# dependencies
+node_modules
+.env
+
+# production
+/dist
