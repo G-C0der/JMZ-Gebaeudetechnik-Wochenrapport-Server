@@ -1,8 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {workdayFormFields, serverError, workdayValidationSchema} from "../constants";
-import {filterModelFields, getWeekDateRange, toDateOnly} from "../utils";
-import {Workday} from "../models";
-import {Op} from "sequelize";
+import {filterModelFields, toDateOnly} from "../utils";
+import {sequelize, Workday, Workweek} from "../models";
 
 const save = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -18,7 +17,12 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(400).send(err.errors[0]);
     }
 
-    // Create/update workday
+    // Create workweek if not exists & create/update workday
+    sequelize.transaction(async (t) => {
+      const [workweek] = await Workweek.findOrCreate({
+        where: {}
+      });
+    });
     const dateOnly = toDateOnly(new Date(otherFields.date));
     const existingWorkday = await Workday.findOne({
       where: {
@@ -48,46 +52,6 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const list = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { params: { date } } = req;
-
-    // Get week date range
-    const dateOnly = toDateOnly(new Date(date));
-    const weekDateRange = getWeekDateRange(new Date(dateOnly));
-
-    // Query work week
-    const workWeek = await Workday.findAll({
-      where: {
-        date: {
-          [Op.between]: [weekDateRange.start, weekDateRange.end]
-        }
-      }
-    });
-
-    // Send response
-    res.status(200).json({
-      workWeek
-    });
-  } catch (err) {
-    console.error(`${serverError} Error: ${err}`);
-    res.status(500).send(serverError);
-    next(err);
-  }
-};
-
-const approve = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-
-  } catch (err) {
-    console.error(`${serverError} Error: ${err}`);
-    res.status(500).send(serverError);
-    next(err);
-  }
-};
-
 export {
-  save,
-  list,
-  approve
+  save
 };
