@@ -1,9 +1,9 @@
 import {Model} from "sequelize";
 
-const toEditableModelFields = (modelFields: Partial<Model>, editableModelFields: string[]) => Object.fromEntries(
-  Object.entries(modelFields).filter(([key]) => editableModelFields.includes(key))
+const filterModelFields = (modelFields: Partial<Model>, selectedModelFields: string[]) => Object.fromEntries(
+  Object.entries(modelFields).filter(([key]) => selectedModelFields.includes(key))
 );
 
 export {
-  toEditableModelFields
+  filterModelFields
 };

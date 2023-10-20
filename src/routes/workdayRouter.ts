@@ -1,10 +1,10 @@
 import {Router} from "express";
 import {authenticate, authorize, rateLimiter} from "../middlewares";
-import {approve, create, list} from "../controllers/WorkdayController";
+import {approve, save, list} from "../controllers/WorkdayController";
 
 const workdayRouter = Router();
 
-workdayRouter.post('/workdays', rateLimiter, authenticate, create);
+workdayRouter.post('/workdays', rateLimiter, authenticate, save);
 workdayRouter.get('/workdays', rateLimiter, authenticate, list);
 workdayRouter.patch('/workdays', rateLimiter, authenticate, authorize, approve);
 

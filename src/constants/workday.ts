@@ -6,7 +6,7 @@ const workdayFieldLengths = {
   project: { max: 200 }
 };
 
-const editableWorkdayFields = [
+const workdayFormFields = [
   'date',
   'from',
   'to',
@@ -18,5 +18,5 @@ const editableWorkdayFields = [
 
 export {
   workdayFieldLengths,
-  editableWorkdayFields
+  workdayFormFields
 };

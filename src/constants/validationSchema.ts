@@ -1,11 +1,12 @@
 import * as yup from "yup";
 import {userFieldLengths} from "./user";
 import {escapeForRegExp} from "../utils";
+import {workdayFieldLengths} from "./workday";
 
 const passwordSpecialCharacters = '*.!@#$%^&(){}[\]:;<>,.?\/~_+\-=|\\';
 const passwordSpecialCharactersDoubleEscaped = escapeForRegExp(passwordSpecialCharacters);
 
-const timePattern = '^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$';
+const timeRegex = new RegExp('^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$');
 
 const emailValidationSchema = yup
   .string()
@@ -25,8 +26,36 @@ const passwordValidationSchema = yup
     'Password must contain at least one special character.')
   .min(userFieldLengths.password.min, `Password is too short - should be minimum ${userFieldLengths.password.min} characters.`);
 
+const workdayValidationSchema = yup.object({
+  date: yup
+    .date()
+    .required('Date is required.'),
+  from: yup
+    .string()
+    .matches(timeRegex),
+  to: yup
+    .string()
+    .matches(timeRegex),
+  from2: yup
+    .string()
+    .matches(timeRegex),
+  to2: yup
+    .string()
+    .matches(timeRegex),
+  project: yup
+    .string()
+    .required('Project is required.')
+    .max(workdayFieldLengths.project.max,
+      `Project is too long - should be maximum ${workdayFieldLengths.project.max} characters.`),
+  code: yup
+    .number()
+    .required('Code is required.')
+    .min(3, 'Code has to be 3 digits long.')
+    .max(3, 'Code has to be 3 digits long.')
+});
+
 export {
   emailValidationSchema,
   passwordValidationSchema,
-  timePattern
+  workdayValidationSchema
 };
