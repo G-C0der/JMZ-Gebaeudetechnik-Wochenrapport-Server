@@ -5,6 +5,8 @@ import {escapeForRegExp} from "../utils";
 const passwordSpecialCharacters = '*.!@#$%^&(){}[\]:;<>,.?\/~_+\-=|\\';
 const passwordSpecialCharactersDoubleEscaped = escapeForRegExp(passwordSpecialCharacters);
 
+const timePattern = '^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$';
+
 const emailValidationSchema = yup
   .string()
   .required('Email is required.')
@@ -25,5 +27,6 @@ const passwordValidationSchema = yup
 
 export {
   emailValidationSchema,
-  passwordValidationSchema
+  passwordValidationSchema,
+  timePattern
 };

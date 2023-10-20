@@ -4,7 +4,7 @@ import {approve, create, list} from "../controllers/WorkdayController";
 
 const workdayRouter = Router();
 
-workdayRouter.post('/wordkays', rateLimiter, authenticate, create);
+workdayRouter.post('/workdays', rateLimiter, authenticate, create);
 workdayRouter.get('/workdays', rateLimiter, authenticate, list);
 workdayRouter.patch('/workdays', rateLimiter, authenticate, authorize, approve);
 
