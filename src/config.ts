@@ -25,7 +25,7 @@ const smtpExchangePassword = process.env.SMTP_EXCHANGE_PASSWORD;
 
 const jmzEmail = process.env.JMZ_EMAIL || '';
 
-const clientAppName = process.env.CLIENT_DEEP_LINK || 'jmzgebaeudetechnikwochenrapport';
+const clientAppName = process.env.CLIENT_APP_NAME || 'jmzgebaeudetechnikwochenrapport';
 
 export {
     isDevEnv,
