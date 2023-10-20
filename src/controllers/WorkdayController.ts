@@ -1,12 +1,12 @@
 import {NextFunction, Request, Response} from "express";
 import {workdayFormFields, serverError, workdayValidationSchema} from "../constants";
-import {filterModelFields} from "../utils";
+import {filterModelFields, getWeekDateRange, toDateOnly} from "../utils";
 import {Workday} from "../models";
-import moment from "moment";
+import {Op} from "sequelize";
 
 const save = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { body, user: { id: userId } } = req as { body: any, user: { id: number } };
+    const { body, user: { id: userId } } = req as { body: Partial<Workday>, user: { id: number } };
 
     // Only use allowed workday fields
     const otherFields = filterModelFields(body, workdayFormFields);
@@ -18,15 +18,14 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(400).send(err.errors[0]);
     }
 
-    // Explicitly format date to dateonly to avoid any potential pitfalls related to timezones or format mismatches
-    const date = new Date(otherFields.date);
-    const formattedDate = moment(date).format('YYYY-MM-DD');
-
     // Create/update workday
-    const existingWorkday = await Workday.findOne({ where: {
-      userId,
-      date: formattedDate
-    } });
+    const dateOnly = toDateOnly(new Date(otherFields.date));
+    const existingWorkday = await Workday.findOne({
+      where: {
+        userId,
+        date: dateOnly
+      }
+    });
     if (existingWorkday) {
       const { date, ...editableFields } = otherFields;
       await existingWorkday.update({
@@ -36,7 +35,7 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
       await Workday.create({
         userId,
         ...otherFields,
-        date: formattedDate
+        date: dateOnly
       });
     }
 
@@ -51,7 +50,25 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
 
 const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { params: { date } } = req;
 
+    // Get week date range
+    const dateOnly = toDateOnly(new Date(date));
+    const weekDateRange = getWeekDateRange(new Date(dateOnly));
+
+    // Query work week
+    const workWeek = await Workday.findAll({
+      where: {
+        date: {
+          [Op.between]: [weekDateRange.start, weekDateRange.end]
+        }
+      }
+    });
+
+    // Send response
+    res.status(200).json({
+      workWeek
+    });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
