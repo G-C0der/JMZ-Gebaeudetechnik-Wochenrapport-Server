@@ -33,7 +33,7 @@ Workday.init({
     }
   },
   date: {
-    type: DataTypes.DATE,
+    type: DataTypes.DATEONLY,
     allowNull: false
   },
   from: {
@@ -58,7 +58,13 @@ Workday.init({
   }
 }, {
   sequelize,
-  tableName: 'workdays'
+  tableName: 'workdays',
+  indexes: [
+    {
+      fields: ['userId', 'date'],
+      unique: true
+    }
+  ]
 });
 
 export {
