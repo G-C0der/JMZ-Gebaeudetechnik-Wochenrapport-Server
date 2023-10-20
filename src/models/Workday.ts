@@ -4,7 +4,6 @@ import {workdayFieldLengths} from "../constants";
 
 class Workday extends Model {
   public id!: number;
-  public userId!: number;
   public date!: Date;
   public from!: string;
   public to!: string;
@@ -24,11 +23,11 @@ Workday.init({
     autoIncrement: true,
     primaryKey: true
   },
-  userId: {
+  workweekId: {
     type: DataTypes.INTEGER.UNSIGNED,
     allowNull: false,
     references: {
-      model: 'users',
+      model: 'workweeks',
       key: 'id'
     }
   },
@@ -61,7 +60,7 @@ Workday.init({
   tableName: 'workdays',
   indexes: [
     {
-      fields: ['userId', 'date'],
+      fields: ['workweekId', 'date'],
       unique: true
     }
   ]

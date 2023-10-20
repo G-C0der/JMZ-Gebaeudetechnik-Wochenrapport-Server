@@ -12,6 +12,7 @@ const sequelize = new Sequelize(
 
 // Models initialization
 import { User } from './User';
+import { Workweek } from "./Workweek";
 import { Workday } from './Workday';
 
 // Relations setup
@@ -23,5 +24,6 @@ export {
 
   // Models
   User,
+  Workweek,
   Workday
 };
