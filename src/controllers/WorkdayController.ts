@@ -1,7 +1,8 @@
 import {NextFunction, Request, Response} from "express";
-import {workdayFormFields, serverError, workdayValidationSchema} from "../constants";
-import {filterModelFields, toDateOnly} from "../utils";
+import {workdayFormFields, serverError, workdayValidationSchema, editableWorkdayFields} from "../constants";
+import {filterModelFields, getWeekDateRange, toDateOnly} from "../utils";
 import {sequelize, Workday, Workweek} from "../models";
+import {Op} from "sequelize";
 
 const save = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -17,31 +18,34 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(400).send(err.errors[0]);
     }
 
-    // Create workweek if not exists & create/update workday
-    sequelize.transaction(async (t) => {
-      const [workweek] = await Workweek.findOrCreate({
-        where: {}
-      });
-    });
+    // Get week date range
     const dateOnly = toDateOnly(new Date(otherFields.date));
-    const existingWorkday = await Workday.findOne({
-      where: {
-        userId,
-        date: dateOnly
+    const { start, end } = getWeekDateRange(new Date(dateOnly));
+
+    sequelize.transaction(async (transaction) => {
+      // Find/create workweek
+      const [{ id }] = await Workweek.findOrCreate({
+        where: { date: { [Op.between]: [start, end] } },
+        defaults: { userId, start, end },
+        transaction
+      });
+
+      // Update/create workday
+      const workday = await Workday.findOne({
+        where: { workdayId: id, date: dateOnly },
+        transaction
+      });
+      if (workday) {
+        const editableFields = filterModelFields(otherFields, editableWorkdayFields);
+        await workday.update(editableFields, { transaction });
+      } else {
+        await Workday.create({
+          workdayId: id,
+          ...otherFields,
+          date: dateOnly
+        }, { transaction });
       }
     });
-    if (existingWorkday) {
-      const { date, ...editableFields } = otherFields;
-      await existingWorkday.update({
-        ...editableFields
-      });
-    } else {
-      await Workday.create({
-        userId,
-        ...otherFields,
-        date: dateOnly
-      });
-    }
 
     // Send response
     res.status(200).send('Workday save succeeded.');

@@ -16,7 +16,10 @@ const workdayFormFields = [
   'code'
 ];
 
+const editableWorkdayFields = workdayFormFields.filter(field => field !== 'date');
+
 export {
   workdayFieldLengths,
-  workdayFormFields
+  workdayFormFields,
+  editableWorkdayFields
 };

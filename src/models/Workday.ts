@@ -4,6 +4,7 @@ import {workdayFieldLengths} from "../constants";
 
 class Workday extends Model {
   public id!: number;
+  public workweekId!: number;
   public date!: Date;
   public from!: string;
   public to!: string;

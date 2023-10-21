@@ -1,29 +1,30 @@
 import {NextFunction, Request, Response} from "express";
 import {getWeekDateRange, toDateOnly} from "../utils";
-import {Workday} from "../models";
-import {Op} from "sequelize";
-import {serverError} from "../constants";
+import {Workday, Workweek} from "../models";
+import {editableWorkdayFields, serverError} from "../constants";
 
 const fetch = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { params: { date } } = req;
+    const { params: { date }, user: { id: userId } } = req as { params: any, user: { id: number } };
 
     // Get week date range
     const dateOnly = toDateOnly(new Date(date));
-    const weekDateRange = getWeekDateRange(new Date(dateOnly));
+    const { start, end } = getWeekDateRange(new Date(dateOnly));
 
-    // Query work week
-    const workWeek = await Workday.findAll({
-      where: {
-        date: {
-          [Op.between]: [weekDateRange.start, weekDateRange.end]
-        }
-      }
+    // Query workweek
+    const workweek = await Workweek.findOne({
+      where: { userId, start, end },
+      include: [{
+        model: Workday,
+        as: 'workday',
+        attributes: editableWorkdayFields,
+        order: [['date', 'ASC']]
+      }]
     });
 
     // Send response
     res.status(200).json({
-      workWeek
+      workweek
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
@@ -45,4 +46,4 @@ const approve = async (req: Request, res: Response, next: NextFunction) => {
 export {
   fetch,
   approve
-}
+};
