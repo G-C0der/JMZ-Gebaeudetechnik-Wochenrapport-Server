@@ -24,7 +24,7 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
 
     sequelize.transaction(async (transaction) => {
       // Find/create workweek
-      const [{ id }] = await Workweek.findOrCreate({
+      const [{ id: workweekId }] = await Workweek.findOrCreate({
         where: { date: { [Op.between]: [start, end] } },
         defaults: { userId, start, end },
         transaction
@@ -32,7 +32,7 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
 
       // Update/create workday
       const workday = await Workday.findOne({
-        where: { workdayId: id, date: dateOnly },
+        where: { workweekId, date: dateOnly },
         transaction
       });
       if (workday) {
@@ -40,7 +40,7 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
         await workday.update(editableFields, { transaction });
       } else {
         await Workday.create({
-          workdayId: id,
+          workweekId,
           ...otherFields,
           date: dateOnly
         }, { transaction });
