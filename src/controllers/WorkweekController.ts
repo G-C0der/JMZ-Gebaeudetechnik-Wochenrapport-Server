@@ -35,7 +35,14 @@ const fetch = async (req: Request, res: Response, next: NextFunction) => {
 
 const approve = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { body: { userId, start, end } } = req;
 
+    // Approve workweek
+    const [affectedCount] = await Workweek.update({ approved: true }, { where: { userId, start, end } });
+
+    // Send response
+    if (affectedCount <= 0) return res.status(404).send('No matching workweek found for approval.');
+    res.status(200).send('Workweek approval succeeded.');
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
