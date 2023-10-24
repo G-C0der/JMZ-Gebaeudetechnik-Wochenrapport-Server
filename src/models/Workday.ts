@@ -1,9 +1,10 @@
 import { DataTypes, Model } from 'sequelize';
 import {sequelize} from './';
+import {workdayFieldLengths} from "../constants";
 
 class Workday extends Model {
   public id!: number;
-  public userId!: number;
+  public workweekId!: number;
   public date!: Date;
   public from!: string;
   public to!: string;
@@ -23,32 +24,32 @@ Workday.init({
     autoIncrement: true,
     primaryKey: true
   },
-  userId: {
+  workweekId: {
     type: DataTypes.INTEGER.UNSIGNED,
     allowNull: false,
     references: {
-      model: 'users',
+      model: 'workweeks',
       key: 'id'
     }
   },
   date: {
-    type: DataTypes.DATE,
+    type: DataTypes.DATEONLY,
     allowNull: false
   },
   from: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING(workdayFieldLengths.from.max)
   },
   to: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING(workdayFieldLengths.to.max)
   },
   from2: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING(workdayFieldLengths.from2.max)
   },
   to2: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING(workdayFieldLengths.to2.max)
   },
   project: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(workdayFieldLengths.project.max),
     allowNull: false
   },
   code: {
@@ -57,7 +58,13 @@ Workday.init({
   }
 }, {
   sequelize,
-  tableName: 'workdays'
+  tableName: 'workdays',
+  indexes: [
+    {
+      fields: ['workweekId', 'date'],
+      unique: true
+    }
+  ]
 });
 
 export {

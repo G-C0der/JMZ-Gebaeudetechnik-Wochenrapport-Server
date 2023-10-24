@@ -12,14 +12,14 @@ import {
   userAlreadyVerifiedError, editableUserFields
 } from "../constants";
 import {VerificationError} from "../errors";
-import {toEditableUserFields} from "../utils";
+import {filterModelFields} from "../utils";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let { email, password, ...otherFields } = req.body;
 
     // Only use allowed user fields
-    otherFields = toEditableUserFields(otherFields);
+    otherFields = filterModelFields(otherFields, editableUserFields);
 
     // Validate email
     if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
