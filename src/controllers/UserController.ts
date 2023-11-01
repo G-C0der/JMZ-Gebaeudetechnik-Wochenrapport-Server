@@ -247,7 +247,10 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Fetch all users
     const users = await User.findAll({
-      attributes: { exclude: ['password'] },
+      attributes: {
+        exclude: ['password', 'deletedAt'],
+        include: ['active']
+      },
       paranoid: false,
       order: [
         ['fname', 'ASC'],

@@ -7,6 +7,7 @@ class User extends Model {
   public email!: string;
   public password!: string;
   public verified!: boolean;
+  public active!: boolean;
   public admin!: boolean;
   public title?: string;
   public fname?: string;
@@ -40,6 +41,12 @@ User.init({
     type: new DataTypes.BOOLEAN(),
     allowNull: false,
     defaultValue: false
+  },
+  active: {
+    type: new DataTypes.VIRTUAL,
+    get() {
+      return !this.getDataValue('deletedAt');
+    }
   },
   admin: {
     type: new DataTypes.BOOLEAN(),
