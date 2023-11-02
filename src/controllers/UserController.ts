@@ -13,7 +13,7 @@ import {
 } from "../constants";
 import {VerificationError} from "../errors";
 import {filterModelFields} from "../utils";
-import {ResponseSeverity} from "../enums/ResponseSeverity";
+import {ResponseSeverity} from "../enums";
 
 const { SeveritySuccess, SeverityError, SeverityWarning } = ResponseSeverity;
 
@@ -95,8 +95,8 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
     });
     if (!user) return res.status(400).send('A user with the specified email doesn\'t exist.');
     if (user.verified) return res.status(400).json({
-      message: userAlreadyVerifiedError,
-      severity: 'warning'
+      severity: SeverityWarning,
+      message: userAlreadyVerifiedError
     });
 
     // Create verification URL
@@ -137,8 +137,8 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
 
     // Check if user already verified
     if (user!.verified) return res.status(400).json({
-      message: userAlreadyVerifiedError,
-      severity: 'warning'
+      severity: SeverityWarning,
+      message: userAlreadyVerifiedError
     });
 
     // Set user verified

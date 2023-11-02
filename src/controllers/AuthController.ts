@@ -7,6 +7,9 @@ import moment from "moment";
 import validator from 'validator';
 import {emailValidationSchema, passwordValidationSchema, serverError} from "../constants";
 import * as yup from 'yup';
+import {ResponseSeverity} from "../enums";
+
+const { SeverityWarning } = ResponseSeverity;
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -39,8 +42,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
     // Verify user
     if (!user.verified) return res.status(400).json({
-      message: 'Your user account hasn\'t been verified yet.',
-      severity: 'warning'
+      severity: SeverityWarning,
+      message: 'Your user account hasn\'t been verified yet.'
     });
 
     // Create token
