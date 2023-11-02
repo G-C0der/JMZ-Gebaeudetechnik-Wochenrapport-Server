@@ -13,6 +13,9 @@ import {
 } from "../constants";
 import {VerificationError} from "../errors";
 import {filterModelFields} from "../utils";
+import {ResponseSeverity} from "../enums/ResponseSeverity";
+
+const { SeveritySuccess, SeverityError, SeverityWarning } = ResponseSeverity;
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -67,8 +70,9 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     const wasEmailSent = await mailer.sendVerificationPendingEmail(email, verificationUrl);
 
     // Send response
-    res.status(200).json({
-      wasEmailSent
+    res.status(200).send({
+      severity: wasEmailSent ? SeveritySuccess : SeverityWarning,
+      message: wasEmailSent ? 'Verification email was sent.' : 'Error sending verification email.'
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
@@ -108,7 +112,8 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
 
     // Send response
     res.status(200).json({
-      wasEmailSent
+      severity: wasEmailSent ? SeveritySuccess : SeverityError,
+      message: wasEmailSent ? 'Verification email was sent.' : 'Error sending verification email.'
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
@@ -175,7 +180,8 @@ const sendResetPasswordEmail = async (req: Request, res: Response, next: NextFun
 
     // Send response
     res.status(200).json({
-      wasEmailSent
+      severity: wasEmailSent ? SeveritySuccess : SeverityError,
+      message: wasEmailSent ? 'Password reset email was sent.' : 'Error sending password reset email.'
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
