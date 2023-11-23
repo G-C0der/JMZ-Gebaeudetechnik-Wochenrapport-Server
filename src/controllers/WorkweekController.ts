@@ -16,7 +16,7 @@ const fetch = async (req: Request, res: Response, next: NextFunction) => {
       where: { userId, start, end },
       include: [{
         model: Workday,
-        as: 'workday',
+        as: 'workdays',
         attributes: editableWorkdayFields,
         order: [['date', 'ASC']]
       }]
