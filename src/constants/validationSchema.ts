@@ -32,15 +32,19 @@ const workdayValidationSchema = yup.object({
     .required('Date is required.'),
   from: yup
     .string()
+    .nullable()
     .matches(timeRegex),
   to: yup
     .string()
+    .nullable()
     .matches(timeRegex),
   from2: yup
     .string()
+    .nullable()
     .matches(timeRegex),
   to2: yup
     .string()
+    .nullable()
     .matches(timeRegex),
   project: yup
     .string()
