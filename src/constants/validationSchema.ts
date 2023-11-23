@@ -49,9 +49,9 @@ const workdayValidationSchema = yup.object({
       `Project is too long - should be maximum ${workdayFieldLengths.project.max} characters.`),
   code: yup
     .number()
-    .required('Code is required.')
-    .min(100, 'Code has to be 3 digits long.')
-    .max(999, 'Code has to be 3 digits long.')
+    .required('Type is required.')
+    .min(100, 'Type is required.')
+    .max(999, 'Type is required.')
 });
 
 export {
