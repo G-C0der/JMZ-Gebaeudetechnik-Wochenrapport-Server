@@ -2,7 +2,6 @@ import {NextFunction, Request, Response} from "express";
 import {workdayFormFields, serverError, workdayValidationSchema, editableWorkdayFields} from "../constants";
 import {filterModelFields, getWeekDateRange, toDateOnly} from "../utils";
 import {sequelize, Workday, Workweek} from "../models";
-import {Op} from "sequelize";
 
 const save = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -25,7 +24,7 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
     await sequelize.transaction(async (transaction) => {
       // Find/create workweek
       const [workweek, wasCreated] = await Workweek.findOrCreate({
-        where: { date: { [Op.between]: [start, end] } },
+        where: { start, end },
         defaults: { userId, start, end },
         transaction
       });
