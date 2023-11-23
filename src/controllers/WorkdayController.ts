@@ -24,7 +24,7 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
     await sequelize.transaction(async (transaction) => {
       // Find/create workweek
       const [workweek, wasCreated] = await Workweek.findOrCreate({
-        where: { start, end },
+        where: { userId, start, end },
         defaults: { userId, start, end },
         transaction
       });
