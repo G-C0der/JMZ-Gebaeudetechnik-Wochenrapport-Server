@@ -5,7 +5,7 @@ import moment from "moment";
  * Useful to avoid any potential pitfalls related to timezones or format mismatches
  * @param date
  */
-const toDateOnly = (date: Date) => moment(date).format('YYYY-MM-DD');
+const toDateOnly = (date?: Date) => moment(date).format('YYYY-MM-DD');
 
 /**
  * Get week date range from a specific date
