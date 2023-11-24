@@ -4,7 +4,7 @@ import {fetch, approve} from "../controllers/WorkweekController";
 
 const workweekRouter = Router();
 
-workweekRouter.get('/workweeks/:date', rateLimiter, authenticate, fetch);
+workweekRouter.get('/workweeks/:date', authenticate, fetch);
 workweekRouter.patch('/workweeks', rateLimiter, authenticate, authorize, approve);
 
 export default workweekRouter;
