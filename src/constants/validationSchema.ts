@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import {userFieldLengths} from "./user";
 import {escapeForRegExp, timeStringToMinutes} from "../utils";
-import {workdayFieldLengths} from "./workday";
+import {codes, workdayFieldLengths} from "./workday";
 
 const passwordSpecialCharacters = '*.!@#$%^&(){}[\]:;<>,.?\/~_+\-=|\\';
 const passwordSpecialCharactersDoubleEscaped = escapeForRegExp(passwordSpecialCharacters);
@@ -54,8 +54,7 @@ const workdayValidationSchema = yup.object({
   code: yup
     .number()
     .required('Type is required.')
-    .min(100, 'Type is required.')
-    .max(999, 'Type is required.')
+    .oneOf(codes, 'Type is invalid.')
 }).test('time-validation', 'Time validation failed', function(value) {
   const { from, to, from2, to2 } = value;
 

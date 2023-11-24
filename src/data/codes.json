@@ -1,0 +1,17 @@
+{
+  "500": "Vorfabrikation",
+  "501": "Einlegen",
+  "502": "Rohmontage",
+  "503": "Fertigmontage",
+  "504": "Magazin",
+  "505": "Reglearbeiten",
+  "506": "Service",
+  "507": "Büro",
+  "800": "Ferien",
+  "801": "Militär",
+  "802": "Krankheit",
+  "803": "Arzt/Zahnarzt",
+  "804": "Unfall",
+  "805": "Berufsschule",
+  "806": "Feiertag"
+}
