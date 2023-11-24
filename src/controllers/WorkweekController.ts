@@ -14,6 +14,7 @@ const fetch = async (req: Request, res: Response, next: NextFunction) => {
     // Query workweek
     const workweek = await Workweek.findOne({
       where: { userId, start, end },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
       include: [{
         model: Workday,
         as: 'workdays',
