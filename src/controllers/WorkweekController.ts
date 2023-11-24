@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {getWeekDateRange, toDateOnly} from "../utils";
 import {Workday, Workweek} from "../models";
-import {editableWorkdayFields, serverError} from "../constants";
+import {serverError, workdayFormFields} from "../constants";
 
 const fetch = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -17,7 +17,7 @@ const fetch = async (req: Request, res: Response, next: NextFunction) => {
       include: [{
         model: Workday,
         as: 'workdays',
-        attributes: editableWorkdayFields,
+        attributes: workdayFormFields,
         order: [['date', 'ASC']]
       }]
     });
