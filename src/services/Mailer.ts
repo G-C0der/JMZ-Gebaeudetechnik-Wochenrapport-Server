@@ -1,5 +1,5 @@
 import nodemailer, {SentMessageInfo} from 'nodemailer';
-import {smtpExchangeHost, smtpExchangePort, smtpExchangeEmail, smtpExchangePassword} from '../config';
+import {smtpExchangeHost, smtpExchangePort, smtpExchangeEmail, smtpExchangePassword} from '../config/env';
 import ejs from 'ejs';
 import path from 'path';
 import { escape } from 'lodash';

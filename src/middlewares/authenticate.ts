@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {authSecret} from "../config";
+import {authSecret} from "../config/env";
 import jwt from "jsonwebtoken";
 import {User} from "../models";
 import {serverError, unauthorizedError} from "../constants";

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import {clientAppName} from "../config";
+import {clientAppName} from "../config/env";
 import {User} from "../models";
 import {ServerError, VerificationError} from "../errors";
 import {urlExpiredError, urlInvalidError, urlNoUserAssociatedError} from "../constants";

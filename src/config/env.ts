@@ -6,7 +6,7 @@ const env = process.env.NODE_ENV || "development";
 const isDevEnv = env === "development";
 const isProdEnv = env === "production";
 
-const appPort = process.env.PORT;
+const appPort = process.env.PORT || 4000;
 
 const databaseName = process.env.DB_NAME;
 const databaseHost = process.env.DB_HOST;

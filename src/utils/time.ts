@@ -11,25 +11,10 @@ const toDateOnly = (date?: Date): string => moment(date).format('YYYY-MM-DD');
  * Get week date range from a specific date
  * @param date
  */
-const getWeekDateRange = (date: Date) => {
-  // Set the locale to start the week on Monday
-  moment.locale('en', {
-    week: {
-      dow: 1, // First day of the week is Monday
-    }
-  });
-
-  // Start of the week (Monday)
-  const startOfWeek = moment(date).startOf('week');
-
-  // End of the week (Sunday)
-  const endOfWeek = moment(date).endOf('week');
-
-  return {
-    start: startOfWeek.format('YYYY-MM-DD'),
-    end: endOfWeek.format('YYYY-MM-DD')
-  };
-};
+const getWeekDateRange = (date: Date) => ({
+  start: moment(date).startOf('week').format('YYYY-MM-DD'), // Start of the week (Monday)
+  end: moment(date).endOf('week').format('YYYY-MM-DD') // End of the week (Sunday)
+});
 
 const timeStringToMinutes = (time: string | null) => {
   if (!time) return 0;

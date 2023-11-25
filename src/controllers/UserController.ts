@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import * as yup from 'yup';
 import {mailer, userService} from "../services";
 import validator from 'validator';
-import {jmzEmail, passwordResetSecret, verificationSecret} from "../config";
+import {jmzEmail, passwordResetSecret, verificationSecret} from "../config/env";
 import {
   serverError,
   emailValidationSchema,

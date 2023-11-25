@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import {User} from "../models";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import {authSecret} from "../config";
+import {authSecret} from "../config/env";
 import moment from "moment";
 import validator from 'validator';
 import {emailValidationSchema, passwordValidationSchema, serverError} from "../constants";
