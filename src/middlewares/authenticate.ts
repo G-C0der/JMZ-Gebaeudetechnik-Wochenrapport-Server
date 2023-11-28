@@ -18,6 +18,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
     try {
       ({ id } = jwt.verify(token!, authSecret) as jwt.JwtPayload);
     } catch (err) {
+      if (err instanceof jwt.TokenExpiredError) return res.status(401).send('Session expired.');
       return res.status(401).send(unauthorizedError);
     }
 
