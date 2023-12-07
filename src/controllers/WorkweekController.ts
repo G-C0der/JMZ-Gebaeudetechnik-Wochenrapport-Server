@@ -36,7 +36,7 @@ const fetch = async (req: Request, res: Response, next: NextFunction) => {
 
 const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { user: { id: userId } } = req as { user: { id: number } };
+    const { params: { userId } } = req;
 
     // Query workweeks
     const workweeks = await Workweek.findAll({
