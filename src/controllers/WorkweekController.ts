@@ -34,6 +34,27 @@ const fetch = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const list = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { user: { id: userId } } = req as { user: { id: number } };
+
+    // Query workweeks
+    const workweeks = await Workweek.findAll({
+      where: { userId },
+      attributes: { exclude: ['createdAt', 'updatedAt'] }
+    });
+
+    // Send response
+    res.status(200).json({
+      workweeks
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
 const approve = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { body: { userId, start, end } } = req;
@@ -53,5 +74,6 @@ const approve = async (req: Request, res: Response, next: NextFunction) => {
 
 export {
   fetch,
+  list,
   approve
 };

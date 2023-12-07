@@ -20,6 +20,7 @@ const endpointLimits = [
   { endpoint: 'GET:/users', max: 40, keyword: 'user list' },
   { endpoint: 'PATCH:/users/:id/state-change', max: 20, keyword: 'user active state change' },
   // { endpoint: 'GET:/workweeks/:date', max: 200, keyword: 'workweek fetch' }, // TODO: not working
+  { endpoint: 'GET:/workweeks', max: 40, keyword: 'workweek list' },
   { endpoint: 'PATCH:/workweeks', max: 40, keyword: 'workweek approve' },
   { endpoint: 'POST:/workdays', max: 40, keyword: 'workday save' },
 ];
