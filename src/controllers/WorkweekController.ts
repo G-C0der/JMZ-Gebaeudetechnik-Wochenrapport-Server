@@ -57,10 +57,14 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
 
 const approve = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { body: { userId, start, end } } = req;
+    const { body: { ids } } = req;
 
     // Approve workweek
-    const [affectedCount] = await Workweek.update({ approved: true }, { where: { userId, start, end } });
+    let affectedCount = 0;
+    for (const id of ids) {
+      const [affectedCnt] = await Workweek.update({ approved: true }, { where: { id } });
+      affectedCount += affectedCnt;
+    }
 
     // Send response
     if (affectedCount <= 0) return res.status(404).send('No matching workweek found for approval.');
