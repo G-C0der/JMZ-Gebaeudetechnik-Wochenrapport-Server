@@ -27,6 +27,8 @@ const jmzEmail = process.env.JMZ_EMAIL || '';
 
 const clientAppName = process.env.CLIENT_APP_NAME || 'jmzgebaeudetechnikwochenrapport';
 
+const jawsDbMariaUrl = process.env.JAWSDB_MARIA_URL;
+
 export {
     isDevEnv,
     isProdEnv,
@@ -50,5 +52,7 @@ export {
 
     jmzEmail,
 
-    clientAppName
+    clientAppName,
+
+    jawsDbMariaUrl
 };

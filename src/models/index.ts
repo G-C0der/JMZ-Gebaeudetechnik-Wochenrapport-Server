@@ -1,7 +1,18 @@
 import { Sequelize } from 'sequelize';
-import {databaseHost, databaseName, databasePassword, databaseUsername} from "../config/env";
+import {databaseHost, databaseName, databasePassword, databaseUsername, isProdEnv, jawsDbMariaUrl} from "../config/env";
 
-const sequelize = new Sequelize(
+const sequelize = isProdEnv
+  ? new Sequelize(jawsDbMariaUrl!, {
+    dialect: 'mysql',
+    protocol: 'mysql',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+  })
+  : new Sequelize(
   databaseName!,
   databaseUsername,
   databasePassword, {
