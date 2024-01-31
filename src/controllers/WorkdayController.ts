@@ -33,6 +33,10 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
         return Promise.reject(res.status(500).send('Workweek operation failed.')); // Sequelize auto transaction rollback
       }
 
+      if (workweek.approved) {
+        return Promise.reject(res.status(400).send('Workday already approved.'));
+      }
+
       // Update/create workday
       const workday = await Workday.findOne({
         where: { workweekId: workweek.id, date: dateOnly },
