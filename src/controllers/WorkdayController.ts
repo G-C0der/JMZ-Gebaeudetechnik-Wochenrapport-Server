@@ -2,6 +2,8 @@ import {NextFunction, Request, Response} from "express";
 import {workdayFormFields, serverError, workdayValidationSchema, editableWorkdayFields} from "../constants";
 import {filterModelFields, getWeekDateRange, toDateOnly} from "../utils";
 import {sequelize, Workday, Workweek} from "../models";
+import {ServerError} from "../errors";
+import {BadRequestError} from "../errors/BadRequestError";
 
 const save = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -23,15 +25,17 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
 
     await sequelize.transaction(async (transaction) => {
       // Find/create workweek
-      const [workweek, wasCreated] = await Workweek.findOrCreate({
+      const [workweek] = await Workweek.findOrCreate({
         where: { userId, start, end },
         defaults: { userId, start, end },
         transaction
       });
 
-      if (!workweek || (workweek && !workweek.id && !wasCreated)) {
-        return Promise.reject(res.status(500).send('Workweek operation failed.')); // Sequelize auto transaction rollback
-      }
+      // Abort on workweek fetch error
+      if (!workweek || (workweek && !workweek.id)) throw new ServerError('Workweek operation failed.');
+
+      // Abort if related workweek already approved
+      if (workweek.approved) throw new BadRequestError('Workday already approved.');
 
       // Update/create workday
       const workday = await Workday.findOne({
@@ -41,19 +45,20 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
       if (workday) {
         const editableFields = filterModelFields(otherFields, editableWorkdayFields);
         const result = await workday.update(editableFields, { transaction });
-        if (!result) return Promise.reject(res.status(500).send('Workday update failed.')); // Sequelize auto transaction rollback
+        if (!result) throw new ServerError('Workday update failed.');
       } else {
         const result = await Workday.create({
           workweekId: workweek.id,
           ...otherFields,
           date: dateOnly
         }, { transaction });
-        if (!result) return Promise.reject(res.status(500).send('Workday creation failed.')); // Sequelize auto transaction rollback
+        if (!result) throw new ServerError('Workday creation failed.');
       }
     });
 
     res.status(200).send('Workday save succeeded.');
-  } catch (err) {
+  } catch (err: any) {
+    if (err.code) return res.status(err.code).send(err.message);
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
     next(err);
