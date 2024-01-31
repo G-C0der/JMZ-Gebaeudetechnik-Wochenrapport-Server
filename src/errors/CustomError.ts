@@ -1,5 +1,5 @@
 class CustomError extends Error {
-  constructor(public readonly code: number, message: string) {
+  constructor(readonly code: number, message: string) {
     super(message);
   }
 }
