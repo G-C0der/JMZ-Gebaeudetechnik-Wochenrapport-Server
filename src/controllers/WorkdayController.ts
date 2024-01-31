@@ -23,16 +23,18 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
 
     await sequelize.transaction(async (transaction) => {
       // Find/create workweek
-      const [workweek, wasCreated] = await Workweek.findOrCreate({
+      const [workweek] = await Workweek.findOrCreate({
         where: { userId, start, end },
         defaults: { userId, start, end },
         transaction
       });
 
-      if (!workweek || (workweek && !workweek.id && !wasCreated)) {
+      // Abort on workweek fetch error
+      if (!workweek || (workweek && !workweek.id)) {
         return Promise.reject(res.status(500).send('Workweek operation failed.')); // Sequelize auto transaction rollback
       }
 
+      // Abort if related workweek already approved
       if (workweek.approved) {
         return Promise.reject(res.status(400).send('Workday already approved.'));
       }
