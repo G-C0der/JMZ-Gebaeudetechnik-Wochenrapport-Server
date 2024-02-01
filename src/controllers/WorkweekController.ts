@@ -65,17 +65,15 @@ const approve = async (req: Request, res: Response, next: NextFunction) => {
     if (!ids.length) return res.status(400).send('No workweeks to approve provided.');
 
     // Approve workweek
-    let affectedCount = 0;
     const approvedIds = [];
     for (const id of ids) {
       const [affectedCnt] = await Workweek.update({ approved: true }, { where: { id } });
-      affectedCount += affectedCnt;
       if (affectedCnt >= 1) approvedIds.push(id);
     }
-    const wereAllWorkdaysApproved = ids.length === affectedCount;
+    const wereAllWorkdaysApproved = ids.length === approvedIds.length;
 
     // Send response
-    if (affectedCount <= 0) return res.status(404).send('No matching workweek found for approval.');
+    if (!approvedIds.length) return res.status(404).send('No matching workweek found for approval.');
     res.status(200).send({
       severity: wereAllWorkdaysApproved ? SeveritySuccess : SeverityWarning,
       message: wereAllWorkdaysApproved ? 'Workweek approval succeeded.' : 'Not all workweeks were approved.',
