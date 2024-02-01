@@ -2,6 +2,9 @@ import {NextFunction, Request, Response} from "express";
 import {getWeekDateRange, toDateOnly} from "../utils";
 import {Workday, Workweek} from "../models";
 import {serverError, workdayFormFields} from "../constants";
+import {ResponseSeverity} from "../enums";
+
+const { SeveritySuccess, SeverityWarning } = ResponseSeverity;
 
 const fetch = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -61,14 +64,21 @@ const approve = async (req: Request, res: Response, next: NextFunction) => {
 
     // Approve workweek
     let affectedCount = 0;
+    const approvedIds = [];
     for (const id of ids) {
       const [affectedCnt] = await Workweek.update({ approved: true }, { where: { id } });
       affectedCount += affectedCnt;
+      if (affectedCnt >= 1) approvedIds.push(id);
     }
+    const wereAllWorkdayApproved = ids.length === affectedCount;
 
     // Send response
     if (affectedCount <= 0) return res.status(404).send('No matching workweek found for approval.');
-    res.status(200).send('Workweek approval succeeded.');
+    res.status(200).send({
+      severity: wereAllWorkdayApproved ? SeveritySuccess : SeverityWarning,
+      message: wereAllWorkdayApproved ? 'Workweek approval succeeded.' : 'Not all workweeks were approved.',
+      data: { approvedWorkweekIds: approvedIds }
+    });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
