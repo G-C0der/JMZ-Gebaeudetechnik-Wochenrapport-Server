@@ -62,6 +62,8 @@ const approve = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { body: { ids } } = req;
 
+    if (!ids.length) return res.status(400).send('No workweeks to approve provided.');
+
     // Approve workweek
     let affectedCount = 0;
     const approvedIds = [];
@@ -70,13 +72,13 @@ const approve = async (req: Request, res: Response, next: NextFunction) => {
       affectedCount += affectedCnt;
       if (affectedCnt >= 1) approvedIds.push(id);
     }
-    const wereAllWorkdayApproved = ids.length === affectedCount;
+    const wereAllWorkdaysApproved = ids.length === affectedCount;
 
     // Send response
     if (affectedCount <= 0) return res.status(404).send('No matching workweek found for approval.');
     res.status(200).send({
-      severity: wereAllWorkdayApproved ? SeveritySuccess : SeverityWarning,
-      message: wereAllWorkdayApproved ? 'Workweek approval succeeded.' : 'Not all workweeks were approved.',
+      severity: wereAllWorkdaysApproved ? SeveritySuccess : SeverityWarning,
+      message: wereAllWorkdaysApproved ? 'Workweek approval succeeded.' : 'Not all workweeks were approved.',
       data: { approvedWorkweekIds: approvedIds }
     });
   } catch (err) {
