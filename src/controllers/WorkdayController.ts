@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {workdayFormFields, serverError, workdayValidationSchema, editableWorkdayFields} from "../constants";
 import {filterModelFields, getWeekDateRange, toDateOnly} from "../utils";
-import {sequelize, Workday, Workweek} from "../models";
+import {sequelize, User, Workday, Workweek} from "../models";
 import {ServerError} from "../errors";
 import {BadRequestError} from "../errors/BadRequestError";
 
@@ -25,9 +25,10 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
 
     await sequelize.transaction(async (transaction) => {
       // Find/create workweek
+      const user = await User.findByPk(userId);
       const [workweek] = await Workweek.findOrCreate({
         where: { userId, start, end },
-        defaults: { userId, start, end },
+        defaults: { userId, start, end, approved: user!.admin },
         transaction
       });
 
@@ -35,7 +36,7 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
       if (!workweek || (workweek && !workweek.id)) throw new ServerError('Workweek operation failed.');
 
       // Abort if related workweek already approved
-      if (workweek.approved) throw new BadRequestError('Workday already approved.');
+      if (!user!.admin && workweek.approved) throw new BadRequestError('Workday already approved.');
 
       // Update/create workday
       const workday = await Workday.findOne({
