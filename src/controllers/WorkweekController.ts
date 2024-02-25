@@ -8,7 +8,8 @@ const { SeveritySuccess, SeverityWarning } = ResponseSeverity;
 
 const fetch = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { params: { date }, user: { id: userId } } = req as { params: any, user: { id: number } };
+    const { params: { date, userId: viewUserId }, user: { id: authUserId } } = req as { params: any, user: { id: number } };
+    const userId = viewUserId ?? authUserId;
 
     // Get week date range
     const dateOnly = toDateOnly(new Date(date));
