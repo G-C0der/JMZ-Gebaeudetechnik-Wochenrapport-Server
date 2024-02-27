@@ -257,7 +257,6 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
         exclude: ['password', 'deletedAt'],
         include: ['active']
       },
-      paranoid: false,
       order: [
         ['fname', 'ASC'],
         ['lname', 'ASC']
