@@ -10,17 +10,17 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
     const { body, user: { id: userId } } = req as { body: Partial<Workday>, user: { id: number } };
 
     // Only use allowed workday fields
-    const otherFields = filterModelFields(body, workdayFormFields);
+    const rest = filterModelFields(body, workdayFormFields);
 
     // Validate fields
     try {
-      await workdayValidationSchema.validate(otherFields, { abortEarly: false });
+      await workdayValidationSchema.validate(rest, { abortEarly: false });
     } catch (err: any) {
       return res.status(400).send(err.errors[0]);
     }
 
     // Get week date range
-    const dateOnly = toDateOnly(new Date(otherFields.date));
+    const dateOnly = toDateOnly(new Date(rest.date));
     const { start, end } = getWeekDateRange(new Date(dateOnly));
 
     await sequelize.transaction(async (transaction) => {
@@ -44,13 +44,13 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
         transaction
       });
       if (workday) {
-        const editableFields = filterModelFields(otherFields, editableWorkdayFields);
+        const editableFields = filterModelFields(rest, editableWorkdayFields);
         const result = await workday.update(editableFields, { transaction });
         if (!result) throw new ServerError('Workday update failed.');
       } else {
         const result = await Workday.create({
           workweekId: workweek.id,
-          ...otherFields,
+          ...rest,
           date: dateOnly
         }, { transaction });
         if (!result) throw new ServerError('Workday creation failed.');

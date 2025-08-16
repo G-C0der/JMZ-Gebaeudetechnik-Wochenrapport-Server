@@ -19,10 +19,10 @@ const { SeveritySuccess, SeverityError, SeverityWarning } = ResponseSeverity;
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let { email, password, ...otherFields } = req.body;
+    let { email, password, ...rest } = req.body;
 
     // Only use allowed user fields
-    otherFields = filterModelFields(otherFields, editableUserFields);
+    rest = filterModelFields(rest, editableUserFields);
 
     // Validate email
     if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
@@ -52,7 +52,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     const { dataValues: { password: _, ...newUser } } = await User.create({
       email,
       password: hash,
-      ...otherFields
+      ...rest
     });
 
     // Create verification URL
