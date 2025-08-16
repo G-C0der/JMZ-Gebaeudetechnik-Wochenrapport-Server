@@ -1,12 +1,16 @@
 import * as yup from "yup";
 import {userFieldLengths} from "./user";
 import {escapeForRegExp, timeStringToMinutes} from "../utils";
-import {codes, workdayFieldLengths} from "./workday";
+import {
+  codes,
+  workdayFieldLengths,
+  workdayProjectFieldLengths
+} from "./workday";
 
 const passwordSpecialCharacters = '*.!@#$%^&(){}[\]:;<>,.?\/~_+\-=|\\';
 const passwordSpecialCharactersDoubleEscaped = escapeForRegExp(passwordSpecialCharacters);
 
-const timeRegex = new RegExp('^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$');
+const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 const emailValidationSchema = yup
   .string()
@@ -27,70 +31,49 @@ const passwordValidationSchema = yup
   .min(userFieldLengths.password.min, `Password is too short - should be minimum ${userFieldLengths.password.min} characters.`);
 
 const workdayValidationSchema = yup.object({
-  date: yup
-    .date()
-    .required('Date is required.'),
-  from: yup
-    .string()
-    .nullable()
-    .matches(timeRegex),
-  to: yup
-    .string()
-    .nullable()
-    .matches(timeRegex),
-  from2: yup
-    .string()
-    .nullable()
-    .matches(timeRegex),
-  to2: yup
-    .string()
-    .nullable()
-    .matches(timeRegex),
-  project: yup
-    .string()
-    .required('Project is required.')
-    .max(workdayFieldLengths.project.max,
-      `Project is too long - should be maximum ${workdayFieldLengths.project.max} characters.`),
-  code: yup
-    .number()
-    .required('Type is required.')
-    .oneOf(codes, 'Type is invalid.')
-}).test('time-validation', 'Time validation failed', function(value) {
-  const { from, to, from2, to2 } = value;
+  date: yup.date().required('Date is required.'),
+  projects: yup.array().of(
+    yup.object({
+      from: yup.string().nullable().matches(timeRegex),
+      to: yup.string().nullable().matches(timeRegex),
+      from2: yup.string().nullable().matches(timeRegex),
+      to2: yup.string().nullable().matches(timeRegex),
+      project: yup.string()
+        .required('Project is required.')
+        .max(workdayProjectFieldLengths.project.max, `Project too long - max ${workdayProjectFieldLengths.project.max} chars.`),
+      code: yup.number()
+        .required('Type is required.')
+        .oneOf(codes, 'Type is invalid.')
+    }).test('time-validation', 'Time validation failed', function (proj) {
+      const { from, to, from2, to2 } = proj;
 
-  if (to && !from) {
-    return this.createError({ path: 'from', message: 'From is required when To is set.' });
-  }
+      if (to && !from) return this.createError({ path: `from`, message: 'From is required when To is set.' });
+      if (from && !to) return this.createError({ path: `to`, message: 'To is required when From is set.' });
 
-  if (from && !to) {
-    return this.createError({ path: 'to', message: 'To is required when From is set.' });
-  }
+      if (to2 && !from2) return this.createError({ path: `from2`, message: 'From2 is required when To2 is set.' });
+      if (from2 && !to2) return this.createError({ path: `to2`, message: 'To2 is required when From2 is set.' });
 
-  if (to2 && !from2) {
-    return this.createError({ path: 'from2', message: 'From2 is required when To2 is set.' });
-  }
+      if (from && to && timeStringToMinutes(from) >= timeStringToMinutes(to)) {
+        return this.createError({ path: `to`, message: 'To must be after From.' });
+      }
 
-  if (from2 && !to2) {
-    return this.createError({ path: 'to2', message: 'To2 is required when From2 is set.' });
-  }
+      if (to && from2 && timeStringToMinutes(to) >= timeStringToMinutes(from2)) {
+        return this.createError({ path: `from2`, message: 'From2 must be after To.' });
+      }
 
-  if (from && to && timeStringToMinutes(from) >= timeStringToMinutes(to)) {
-    return this.createError({ path: 'to', message: 'To has to be later than From.' });
-  }
+      if (from2 && to2 && timeStringToMinutes(from2) >= timeStringToMinutes(to2)) {
+        return this.createError({ path: `to2`, message: 'To2 must be after From2.' });
+      }
 
-  if (to && from2 && timeStringToMinutes(to) >= timeStringToMinutes(from2)) {
-    return this.createError({ path: 'from2', message: 'From2 has to be later than To.' });
-  }
-
-  if (from2 && to2 && timeStringToMinutes(from2) >= timeStringToMinutes(to2)) {
-    return this.createError({ path: 'to2', message: 'To2 has to be later than From2.' });
-  }
-
-  return true;
+      return true;
+    })
+  ).min(workdayFieldLengths.projects.min).max(workdayFieldLengths.projects.max)
 });
 
 export {
   emailValidationSchema,
   passwordValidationSchema,
-  workdayValidationSchema
+  workdayValidationSchema,
+
+  timeRegex
 };
