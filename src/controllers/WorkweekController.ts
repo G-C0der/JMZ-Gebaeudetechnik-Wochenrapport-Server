@@ -3,6 +3,7 @@ import {getWeekDateRange, toDateOnly} from "../utils";
 import {Workday, Workweek} from "../models";
 import {serverError, workdayFormFields} from "../constants";
 import {ResponseSeverity} from "../enums";
+import {Op, Sequelize} from "sequelize";
 
 const { SeveritySuccess, SeverityWarning } = ResponseSeverity;
 
@@ -40,11 +41,17 @@ const fetch = async (req: Request, res: Response, next: NextFunction) => {
 
 const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { params: { userId } } = req;
+    const { params: { userId, year } } = req;
 
     // Query workweeks
     const workweeks = await Workweek.findAll({
-      where: { userId },
+      where: {
+        userId,
+        [Op.or]: [
+          Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('start')), year),
+          Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('end')), year)
+        ]
+      },
       attributes: { exclude: ['createdAt', 'updatedAt'] }
     });
 

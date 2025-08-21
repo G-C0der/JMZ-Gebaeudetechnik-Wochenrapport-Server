@@ -6,7 +6,7 @@ const workweekRouter = Router();
 
 workweekRouter.get('/workweeks/fetch/:date', authenticate, fetch);
 workweekRouter.get('/workweeks/fetch/:date/:userId', authenticate, authorize, fetch);
-workweekRouter.get('/workweeks/list/:userId', authenticate, authorize, list);
+workweekRouter.get('/workweeks/list/:userId/:year', authenticate, authorize, list);
 workweekRouter.patch('/workweeks', rateLimiter, authenticate, authorize, approve);
 
 export default workweekRouter;
